@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <RootNamespace>SmartFridgeManagerAPI.WebAPI</RootNamespace>
+    <AssemblyName>SmartFridgeManagerAPI.WebAPI</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi"/>
+    <PackageReference Include="Swashbuckle.AspNetCore"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Application\Application.csproj"/>
+  </ItemGroup>
+
+</Project>

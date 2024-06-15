@@ -1,0 +1,8 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>SmartFridgeManagerAPI.Domain</RootNamespace>
+    <AssemblyName>SmartFridgeManagerAPI.Domain</AssemblyName>
+  </PropertyGroup>
+
+</Project>
