@@ -1,44 +1,45 @@
+using SmartFridgeManagerAPI.Application;
+using SmartFridgeManagerAPI.Infrastructure;
+using SmartFridgeManagerAPI.WebAPI;
+
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+string logFilePath = GetLoggerPath(builder);
 
-WebApplication app = builder.Build();
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.File($"{logFilePath}/WebApi/webapi-.log", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+try
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    builder.Services
+        .AddInfrastructureServices(logFilePath)
+        .AddApplicationServices(logFilePath)
+        .AddWebAPIServices();
+
+    WebApplication app = builder.Build();
+
+    app
+        .UseWebAPI()
+        .Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "An error occurred while configuring the web api services.");
+}
+finally
+{
+    Log.CloseAndFlush();
 }
 
-app.UseHttpsRedirection();
-
-string[] summaries =
+static string GetLoggerPath(WebApplicationBuilder builder)
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+    string? relativeLogFilePath = builder.Configuration.GetValue<string>("LoggerFilePath");
+    Guard.Against.NullOrEmpty(relativeLogFilePath, "Please provide a valid path for the log file: 'LoggerFilePath'.");
+    string logFilePath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), relativeLogFilePath));
 
-app.MapGet("/weatherforecast", () =>
-    {
-        WeatherForecast[] forecast = Enumerable.Range(1, 5).Select(index =>
-                new WeatherForecast
-                (
-                    DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                    Random.Shared.Next(-20, 55),
-                    summaries[Random.Shared.Next(summaries.Length)]
-                ))
-            .ToArray();
-        return forecast;
-    })
-    .WithName("GetWeatherForecast")
-    .WithOpenApi();
-
-app.Run();
-
-internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    return logFilePath;
 }
+
+public partial class Program;

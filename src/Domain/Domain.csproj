@@ -5,4 +5,12 @@
     <AssemblyName>SmartFridgeManagerAPI.Domain</AssemblyName>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="MediatR"/>
+    <PackageReference Include="Ardalis.GuardClauses"/>
+    <PackageReference Include="Serilog"/>
+    <PackageReference Include="Serilog.Sinks.Console"/>
+    <PackageReference Include="Serilog.Sinks.File"/>
+  </ItemGroup>
+
 </Project>

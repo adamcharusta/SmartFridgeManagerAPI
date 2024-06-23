@@ -9,4 +9,9 @@
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj"/>
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="AutoMapper"/>
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions"/>
+  </ItemGroup>
+
 </Project>
