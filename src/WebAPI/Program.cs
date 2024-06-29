@@ -14,7 +14,7 @@ try
 {
     builder.Services
         .AddInfrastructureServices(builder.Configuration)
-        .AddApplicationServices()
+        .AddApplicationServices(builder.Configuration)
         .AddWebAPIServices();
 
     WebApplication app = builder.Build();
@@ -23,6 +23,7 @@ try
         .UseInfrastructureAsync();
 
     app
+        .UseApplication()
         .UseWebAPI()
         .Run();
 }

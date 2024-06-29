@@ -11,11 +11,9 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services,
         IConfiguration configuration)
     {
-        string? connectionString = configuration["DB_CONNECTION_STRING"] ??
-                                   configuration.GetConnectionString("DefaultConnection");
-
-        Guard.Against.NullOrEmpty(connectionString,
-            "Please provide a valid connection string: 'DB_CONNECTION_STRING'.");
+        string connectionString = Guard.Against.NullOrEmpty(
+            configuration["DB_CONNECTION_STRING"] ?? configuration.GetConnectionString("DefaultConnection"),
+            "DB_CONNECTION_STRING");
 
         services.AddScoped<ISaveChangesInterceptor, BaseEntityInterceptor>();
 
