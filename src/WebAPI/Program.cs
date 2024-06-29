@@ -1,24 +1,26 @@
 using SmartFridgeManagerAPI.Application;
 using SmartFridgeManagerAPI.Infrastructure;
 using SmartFridgeManagerAPI.WebAPI;
+using SmartFridgeManagerAPI.WebAPI.Infrastructure;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-string logFilePath = GetLoggerPath(builder);
-
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
-    .WriteTo.File($"{logFilePath}/WebApi/webapi-.log", rollingInterval: RollingInterval.Day)
+    .WriteTo.File($"{builder.GetLoggerFilePath()}/logs-.log", rollingInterval: RollingInterval.Day)
     .CreateLogger();
 
 try
 {
     builder.Services
-        .AddInfrastructureServices(logFilePath)
-        .AddApplicationServices(logFilePath)
+        .AddInfrastructureServices(builder.Configuration)
+        .AddApplicationServices()
         .AddWebAPIServices();
 
     WebApplication app = builder.Build();
+
+    await app
+        .UseInfrastructureAsync();
 
     app
         .UseWebAPI()
@@ -26,20 +28,11 @@ try
 }
 catch (Exception ex)
 {
-    Log.Fatal(ex, "An error occurred while configuring the web api services.");
+    Log.Fatal(ex, "An error occurred while app is running.");
 }
 finally
 {
     Log.CloseAndFlush();
-}
-
-static string GetLoggerPath(WebApplicationBuilder builder)
-{
-    string? relativeLogFilePath = builder.Configuration.GetValue<string>("LoggerFilePath");
-    Guard.Against.NullOrEmpty(relativeLogFilePath, "Please provide a valid path for the log file: 'LoggerFilePath'.");
-    string logFilePath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), relativeLogFilePath));
-
-    return logFilePath;
 }
 
 public partial class Program;
