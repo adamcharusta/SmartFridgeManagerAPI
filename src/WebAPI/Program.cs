@@ -19,8 +19,7 @@ try
 
     WebApplication app = builder.Build();
 
-    await app
-        .UseInfrastructureAsync();
+    await app.UseInfrastructureAsync();
 
     app
         .UseApplication()
