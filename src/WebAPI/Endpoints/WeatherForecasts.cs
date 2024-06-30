@@ -1,4 +1,4 @@
-using SmartFridgeManagerAPI.Application.WeatherForecast.Queries;
+using SmartFridgeManagerAPI.Application.WeatherForecasts.Queries;
 using SmartFridgeManagerAPI.WebAPI.Infrastructure;
 
 namespace SmartFridgeManagerAPI.WebAPI.Endpoints;

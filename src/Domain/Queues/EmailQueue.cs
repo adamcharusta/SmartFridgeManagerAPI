@@ -1,5 +1,5 @@
 using RabbitMQ.Client;
-using SmartFridgeManagerAPI.Domain.Common;
+using SmartFridgeManagerAPI.Domain.Queues.Common;
 
 namespace SmartFridgeManagerAPI.Domain.Queues;
 

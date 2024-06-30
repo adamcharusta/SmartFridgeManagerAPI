@@ -45,5 +45,5 @@ EXPOSE 80
 ENTRYPOINT ["sh", "-c", "\
     ./wait-for-it.sh ${RABBITMQ_HOSTNAME}:${RABBITMQ_PORT} --timeout=${WAIT_TIMEOUT} --strict && \
     ./wait-for-it.sh ${DB_HOSTNAME}:${DB_PORT} --timeout=${WAIT_TIMEOUT} --strict && \
-    # ./wait-for-it.sh redis:${REDIS_PORT} --timeout=${WAIT_TIMEOUT} --strict && \
+    ./wait-for-it.sh ${REDIS_HOSTNAME}:${REDIS_PORT} --timeout=${WAIT_TIMEOUT} --strict && \
     dotnet SmartFridgeManagerAPI.WebAPI.dll"]

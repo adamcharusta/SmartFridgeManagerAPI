@@ -2,9 +2,10 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using SmartFridgeManagerAPI.Infrastructure.Interceptors;
-using SmartFridgeManagerAPI.Infrastructure.Services;
-using SmartFridgeManagerAPI.Infrastructure.Settings;
+using SmartFridgeManagerAPI.Infrastructure.Common.Services;
+using SmartFridgeManagerAPI.Infrastructure.Common.Settings;
+using SmartFridgeManagerAPI.Infrastructure.Data;
+using SmartFridgeManagerAPI.Infrastructure.Data.Interceptors;
 
 namespace SmartFridgeManagerAPI.Infrastructure;
 
@@ -15,7 +16,8 @@ public static class DependencyInjection
     {
         return services
             .AddAppDbContext(configuration)
-            .AddRabbitMq(configuration);
+            .AddRabbitMq(configuration)
+            .AddRedis(configuration);
     }
 
     private static IServiceCollection AddAppDbContext(this IServiceCollection services, IConfiguration configuration)
@@ -59,6 +61,19 @@ public static class DependencyInjection
 
         services.AddSingleton(rabbitMqSettings);
         services.AddScoped<IRabbitMqService, RabbitMqService>();
+
+        return services;
+    }
+
+    private static IServiceCollection AddRedis(this IServiceCollection services, IConfiguration configuration)
+    {
+        string hostname = Guard.Against.NullOrEmpty(configuration["REDIS_HOSTNAME"], "REDIS_HOSTNAME");
+        string port = Guard.Against.NullOrEmpty(configuration["REDIS_PORT"], "REDIS_PORT");
+
+        RedisSettings redisSettings = new() { HostName = hostname, Port = Convert.ToInt32(port) };
+
+        services.AddSingleton(redisSettings);
+        services.AddScoped<IRedisService, RedisService>();
 
         return services;
     }

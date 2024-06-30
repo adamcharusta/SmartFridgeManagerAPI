@@ -1,4 +1,4 @@
-using SmartFridgeManagerAPI.Domain.Common;
+using SmartFridgeManagerAPI.Domain.Entities.Common;
 
 namespace SmartFridgeManagerAPI.Domain.Entities;
 

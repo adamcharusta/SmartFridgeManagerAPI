@@ -24,6 +24,12 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions"/>
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore"/>
+    <PackageReference Include="NRedisStack"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Common\"/>
+    <Folder Include="Data\Migrations\"/>
   </ItemGroup>
 
 </Project>

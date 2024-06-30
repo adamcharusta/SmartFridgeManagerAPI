@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Authorization.Policy;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;
-using SmartFridgeManagerAPI.Infrastructure;
-using SmartFridgeManagerAPI.Infrastructure.Services;
+using SmartFridgeManagerAPI.Infrastructure.Common.Services;
+using SmartFridgeManagerAPI.Infrastructure.Data;
 
 namespace SmartFridgeManagerAPI.IntegrationTests.Infrastructure;
 
@@ -45,8 +45,17 @@ public abstract class IntegrationTestsFactory : IClassFixture<WebApplicationFact
                     services.Remove(rabbitMq);
                 }
 
+                ServiceDescriptor? redis = services
+                    .SingleOrDefault(service => service.ServiceType == typeof(IRedisService));
+
+                if (redis != null)
+                {
+                    services.Remove(redis);
+                }
+
                 services.AddScoped<IMediator>(_ => _mediatorFake);
                 services.AddScoped<IRabbitMqService>(_ => Substitute.For<IRabbitMqService>());
+                services.AddScoped<IRedisService>(_ => Substitute.For<IRedisService>());
 
                 services
                     .AddDbContext<AppDbContext>(options => options.UseInMemoryDatabase(Guid.NewGuid().ToString()));
