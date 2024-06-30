@@ -6,8 +6,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using SmartFridgeManagerAPI.Application.Auth.Services;
+using SmartFridgeManagerAPI.Application.Auth.Settings;
 using SmartFridgeManagerAPI.Application.Common.Behaviours;
-using SmartFridgeManagerAPI.Application.Common.Settings;
 using SmartFridgeManagerAPI.Domain.Entities;
 
 namespace SmartFridgeManagerAPI.Application;
@@ -27,6 +28,7 @@ public static class DependencyInjection
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
         return services
+            .AddScoped<IAuthEmailService, AuthEmailService>()
             .AddAutoMapper(Assembly.GetExecutingAssembly())
             .AddValidatorsFromAssembly(Assembly.GetExecutingAssembly())
             .AddMediatR(cfg =>

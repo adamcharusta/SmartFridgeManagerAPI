@@ -5,7 +5,9 @@ namespace SmartFridgeManagerAPI.Application.WeatherForecasts.Queries;
 
 public record GetWeatherForecastsQuery : IRequest<IEnumerable<WeatherForecast>>;
 
-public class GetWeatherForecastsQueryHandler(IRabbitMqService rabbitMqService, IRedisService redisService)
+public class GetWeatherForecastsQueryHandler(
+    IRabbitMqService rabbitMqService,
+    IRedisService redisService)
     : IRequestHandler<GetWeatherForecastsQuery, IEnumerable<WeatherForecast>>
 {
     public async Task<IEnumerable<WeatherForecast>> Handle(GetWeatherForecastsQuery request,

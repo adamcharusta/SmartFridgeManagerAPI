@@ -1,5 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-using NSubstitute.ReturnsExtensions;
 using SmartFridgeManagerAPI.Application.WeatherForecasts.Queries;
 using SmartFridgeManagerAPI.Domain.Entities;
 using SmartFridgeManagerAPI.Domain.Queues;
@@ -7,7 +5,7 @@ using SmartFridgeManagerAPI.UnitTests.Infrastructure;
 
 namespace SmartFridgeManagerAPI.UnitTests.WeatherForecastTests.Queries;
 
-public class GetWeatherForecastsQueryTests : UnitTestFactory<GetWeatherForecastsQueryHandler>
+public class GetWeatherForecastsQueryTests : UnitTestFactory<object, GetWeatherForecastsQueryHandler>
 {
     [Fact]
     public async Task ShouldReturnListOfWeatherForecasts()

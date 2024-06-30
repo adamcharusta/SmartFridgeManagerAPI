@@ -1,4 +1,4 @@
-namespace SmartFridgeManagerAPI.Application.Common.Settings;
+namespace SmartFridgeManagerAPI.Application.Auth.Settings;
 
 public class AuthSettings
 {

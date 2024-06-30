@@ -1,5 +1,4 @@
 using System.Text;
-using Newtonsoft.Json;
 using RabbitMQ.Client;
 using SmartFridgeManagerAPI.Domain.Queues.Common;
 using SmartFridgeManagerAPI.Infrastructure.Common.Settings;

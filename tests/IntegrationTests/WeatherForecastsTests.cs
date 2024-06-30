@@ -1,9 +1,3 @@
-using System.Net;
-using Ardalis.GuardClauses;
-using FluentAssertions;
-using Microsoft.AspNetCore.Mvc.Testing;
-using NSubstitute;
-using NSubstitute.ExceptionExtensions;
 using SmartFridgeManagerAPI.Application.Common.Exceptions;
 using SmartFridgeManagerAPI.Application.WeatherForecasts.Queries;
 using SmartFridgeManagerAPI.IntegrationTests.Infrastructure;

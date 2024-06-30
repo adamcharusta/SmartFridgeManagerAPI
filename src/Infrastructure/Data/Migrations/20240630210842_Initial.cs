@@ -37,7 +37,7 @@ namespace SmartFridgeManagerAPI.Infrastructure.Data.Migrations
                     CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     ModifyAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     UserId = table.Column<int>(type: "int", nullable: false),
-                    Token = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Token = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     ExpiresAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
@@ -61,7 +61,7 @@ namespace SmartFridgeManagerAPI.Infrastructure.Data.Migrations
                     CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     ModifyAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     UserId = table.Column<int>(type: "int", nullable: false),
-                    Token = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Token = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     ExpiresAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },

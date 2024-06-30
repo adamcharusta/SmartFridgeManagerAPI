@@ -1,10 +1,8 @@
-using System.Reflection;
 using AutoMapper;
 using FluentValidation;
 using MediatR;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using SmartFridgeManagerAPI.Application.Auth.Services;
 using SmartFridgeManagerAPI.Application.Common.Behaviours;
 using SmartFridgeManagerAPI.Domain.Entities;
 using SmartFridgeManagerAPI.Infrastructure.Common.Services;
@@ -12,8 +10,9 @@ using SmartFridgeManagerAPI.Infrastructure.Data;
 
 namespace SmartFridgeManagerAPI.UnitTests.Infrastructure;
 
-public abstract class UnitTestFactory<THandler>
+public abstract class UnitTestFactory<TRequest, THandler>
 {
+    protected readonly IAuthEmailService _authEmailService;
     protected readonly AppDbContext _dbContext;
     protected readonly IMapper _mapper;
     protected readonly IMediator _mediator;
@@ -25,11 +24,12 @@ public abstract class UnitTestFactory<THandler>
     {
         ServiceProvider services = new ServiceCollection()
             .AddDbContext<AppDbContext>(opt => opt.UseInMemoryDatabase(Guid.NewGuid().ToString()))
-            .AddAutoMapper(Assembly.GetExecutingAssembly())
-            .AddValidatorsFromAssembly(Assembly.GetExecutingAssembly())
+            .AddAutoMapper(typeof(TRequest))
+            .AddValidatorsFromAssemblyContaining<TRequest>()
             .AddScoped<IPasswordHasher<User>, PasswordHasher<User>>()
             .AddScoped<IRabbitMqService>(_ => Substitute.For<IRabbitMqService>())
             .AddScoped<IRedisService>(_ => Substitute.For<IRedisService>())
+            .AddScoped<IAuthEmailService>(_ => Substitute.For<IAuthEmailService>())
             .AddMediatR(cfg =>
             {
                 cfg.RegisterServicesFromAssemblyContaining<THandler>();
@@ -44,5 +44,6 @@ public abstract class UnitTestFactory<THandler>
         _passwordHasher = services.GetService<IPasswordHasher<User>>()!;
         _rabbitMq = services.GetService<IRabbitMqService>()!;
         _redis = services.GetService<IRedisService>()!;
+        _authEmailService = services.GetService<IAuthEmailService>()!;
     }
 }

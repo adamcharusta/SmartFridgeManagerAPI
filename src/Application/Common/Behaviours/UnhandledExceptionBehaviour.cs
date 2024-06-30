@@ -1,4 +1,8 @@
+using ValidationException = SmartFridgeManagerAPI.Application.Common.Exceptions.ValidationException;
+
 namespace SmartFridgeManagerAPI.Application.Common.Behaviours;
+
+using ValidationException = ValidationException;
 
 public class UnhandledExceptionBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : notnull
@@ -9,6 +13,10 @@ public class UnhandledExceptionBehaviour<TRequest, TResponse> : IPipelineBehavio
         try
         {
             return await next();
+        }
+        catch (ValidationException)
+        {
+            throw;
         }
         catch (Exception ex)
         {

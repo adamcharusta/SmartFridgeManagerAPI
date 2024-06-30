@@ -32,6 +32,7 @@ public static class DependencyInjection
             $"Server={hostName},{port};Database={name};User Id={user};Password={password};{options}";
 
         services.AddScoped<ISaveChangesInterceptor, BaseEntityInterceptor>();
+        services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
 
         services.AddDbContext<AppDbContext>((sp, opt) =>
         {

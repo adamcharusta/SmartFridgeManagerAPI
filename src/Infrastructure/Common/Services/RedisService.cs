@@ -1,4 +1,3 @@
-using Newtonsoft.Json;
 using SmartFridgeManagerAPI.Infrastructure.Common.Settings;
 using StackExchange.Redis;
 

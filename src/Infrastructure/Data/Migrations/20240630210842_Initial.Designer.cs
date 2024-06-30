@@ -12,7 +12,7 @@ using SmartFridgeManagerAPI.Infrastructure.Data;
 namespace SmartFridgeManagerAPI.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240630175208_Initial")]
+    [Migration("20240630210842_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -46,7 +46,6 @@ namespace SmartFridgeManagerAPI.Infrastructure.Data.Migrations
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Token")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UserId")
@@ -81,7 +80,6 @@ namespace SmartFridgeManagerAPI.Infrastructure.Data.Migrations
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Token")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UserId")
