@@ -3,6 +3,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SmartFridgeManagerAPI.Infrastructure.Interceptors;
+using SmartFridgeManagerAPI.Infrastructure.Services;
+using SmartFridgeManagerAPI.Infrastructure.Settings;
 
 namespace SmartFridgeManagerAPI.Infrastructure;
 
@@ -11,9 +13,21 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services,
         IConfiguration configuration)
     {
-        string connectionString = Guard.Against.NullOrEmpty(
-            configuration["DB_CONNECTION_STRING"] ?? configuration.GetConnectionString("DefaultConnection"),
-            "DB_CONNECTION_STRING");
+        return services
+            .AddAppDbContext(configuration)
+            .AddRabbitMq(configuration);
+    }
+
+    private static IServiceCollection AddAppDbContext(this IServiceCollection services, IConfiguration configuration)
+    {
+        string hostName = Guard.Against.NullOrEmpty(configuration["DB_HOSTNAME"], "DB_HOSTNAME");
+        string port = Guard.Against.NullOrEmpty(configuration["DB_PORT"], "DB_PORT");
+        string name = Guard.Against.NullOrEmpty(configuration["DB_NAME"], "DB_NAME");
+        string user = Guard.Against.NullOrEmpty(configuration["DB_USER"], "DB_USER");
+        string password = Guard.Against.NullOrEmpty(configuration["DB_PASS"], "DB_PASS");
+        string options = Guard.Against.NullOrEmpty(configuration["DB_OPTIONS"], "DB_OPTIONS");
+        string connectionString =
+            $"Server={hostName},{port};Database={name};User Id={user};Password={password};{options}";
 
         services.AddScoped<ISaveChangesInterceptor, BaseEntityInterceptor>();
 
@@ -28,6 +42,23 @@ public static class DependencyInjection
 
         services.AddTransient<AppDbContextInitializer>();
         services.AddSingleton(TimeProvider.System);
+        return services;
+    }
+
+    private static IServiceCollection AddRabbitMq(this IServiceCollection services, IConfiguration configuration)
+    {
+        string hostname = Guard.Against.NullOrEmpty(configuration["RABBITMQ_HOSTNAME"], "RABBITMQ_HOSTNAME");
+        string port = Guard.Against.NullOrEmpty(configuration["RABBITMQ_PORT"], "RABBITMQ_PORT");
+        string user = Guard.Against.NullOrEmpty(configuration["RABBITMQ_USER"], "RABBITMQ_USER");
+        string password = Guard.Against.NullOrEmpty(configuration["RABBITMQ_PASS"], "RABBITMQ_PASS");
+
+        RabbitMqSettings rabbitMqSettings = new()
+        {
+            HostName = hostname, Port = Convert.ToInt32(port), UserName = user, Password = password
+        };
+
+        services.AddSingleton(rabbitMqSettings);
+        services.AddScoped<IRabbitMqService, RabbitMqService>();
 
         return services;
     }

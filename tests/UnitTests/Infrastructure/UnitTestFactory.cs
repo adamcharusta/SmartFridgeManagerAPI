@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using SmartFridgeManagerAPI.Application.Common.Behaviours;
 using SmartFridgeManagerAPI.Domain.Entities;
 using SmartFridgeManagerAPI.Infrastructure;
+using SmartFridgeManagerAPI.Infrastructure.Services;
 
 namespace SmartFridgeManagerAPI.UnitTests.Infrastructure;
 
@@ -17,15 +18,16 @@ public abstract class UnitTestFactory<THandler>
     protected readonly IMapper _mapper;
     protected readonly IMediator _mediator;
     protected readonly IPasswordHasher<User> _passwordHasher;
-    protected readonly ServiceProvider _services;
+    protected readonly IRabbitMqService _rabbitMq;
 
     protected UnitTestFactory()
     {
-        _services = new ServiceCollection()
+        ServiceProvider services = new ServiceCollection()
             .AddDbContext<AppDbContext>(opt => opt.UseInMemoryDatabase(Guid.NewGuid().ToString()))
             .AddAutoMapper(Assembly.GetExecutingAssembly())
             .AddValidatorsFromAssembly(Assembly.GetExecutingAssembly())
             .AddScoped<IPasswordHasher<User>, PasswordHasher<User>>()
+            .AddScoped<IRabbitMqService>(_ => Substitute.For<IRabbitMqService>())
             .AddMediatR(cfg =>
             {
                 cfg.RegisterServicesFromAssemblyContaining<THandler>();
@@ -34,9 +36,10 @@ public abstract class UnitTestFactory<THandler>
             })
             .BuildServiceProvider();
 
-        _dbContext = _services.GetService<AppDbContext>()!;
-        _mediator = _services.GetService<IMediator>()!;
-        _mapper = _services.GetService<IMapper>()!;
-        _passwordHasher = _services.GetService<IPasswordHasher<User>>()!;
+        _dbContext = services.GetService<AppDbContext>()!;
+        _mediator = services.GetService<IMediator>()!;
+        _mapper = services.GetService<IMapper>()!;
+        _passwordHasher = services.GetService<IPasswordHasher<User>>()!;
+        _rabbitMq = services.GetService<IRabbitMqService>()!;
     }
 }

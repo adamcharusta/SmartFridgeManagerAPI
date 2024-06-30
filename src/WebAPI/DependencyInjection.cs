@@ -6,11 +6,10 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddWebAPIServices(this IServiceCollection services)
     {
-        services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen();
-        services.AddExceptionHandler<CustomExceptionHandler>();
-
-        return services;
+        return services
+            .AddEndpointsApiExplorer()
+            .AddSwaggerGen()
+            .AddExceptionHandler<CustomExceptionHandler>();
     }
 
     public static WebApplication UseWebAPI(this WebApplication app)

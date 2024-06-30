@@ -17,20 +17,24 @@ public static class DependencyInjection
     public static IServiceCollection AddApplicationServices(this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddAutoMapper(Assembly.GetExecutingAssembly());
-
-        services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
-
-        services.AddMediatR(cfg =>
-        {
-            cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
-            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehaviour<,>));
-            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidateBehaviour<,>));
-        });
-
-        services.AddAuthServices(configuration);
+        services
+            .AddServices()
+            .AddAuthServices(configuration);
 
         return services;
+    }
+
+    private static IServiceCollection AddServices(this IServiceCollection services)
+    {
+        return services
+            .AddAutoMapper(Assembly.GetExecutingAssembly())
+            .AddValidatorsFromAssembly(Assembly.GetExecutingAssembly())
+            .AddMediatR(cfg =>
+            {
+                cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
+                cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehaviour<,>));
+                cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidateBehaviour<,>));
+            });
     }
 
     private static IServiceCollection AddAuthServices(this IServiceCollection services,
@@ -45,24 +49,24 @@ public static class DependencyInjection
             JwtIssuer = jwtIssuer, JwtKey = jwtKey, JwtExpireDays = Convert.ToInt32(jwtExpireDays)
         };
 
-        services.AddSingleton(authSettings);
-
-        services.AddAuthentication(opt =>
-        {
-            opt.DefaultAuthenticateScheme = "Bearer";
-            opt.DefaultScheme = "Bearer";
-            opt.DefaultChallengeScheme = "Bearer";
-        }).AddJwtBearer(cfg =>
-        {
-            cfg.RequireHttpsMetadata = false;
-            cfg.SaveToken = true;
-            cfg.TokenValidationParameters = new TokenValidationParameters
+        services
+            .AddSingleton(authSettings)
+            .AddAuthentication(opt =>
             {
-                ValidIssuer = authSettings.JwtIssuer,
-                ValidAudience = authSettings.JwtIssuer,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authSettings.JwtKey))
-            };
-        });
+                opt.DefaultAuthenticateScheme = "Bearer";
+                opt.DefaultScheme = "Bearer";
+                opt.DefaultChallengeScheme = "Bearer";
+            }).AddJwtBearer(cfg =>
+            {
+                cfg.RequireHttpsMetadata = false;
+                cfg.SaveToken = true;
+                cfg.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidIssuer = authSettings.JwtIssuer,
+                    ValidAudience = authSettings.JwtIssuer,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authSettings.JwtKey))
+                };
+            });
 
         services.AddAuthorization();
         services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();

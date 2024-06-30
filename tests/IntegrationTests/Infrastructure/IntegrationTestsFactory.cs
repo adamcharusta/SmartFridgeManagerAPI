@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;
 using SmartFridgeManagerAPI.Infrastructure;
+using SmartFridgeManagerAPI.Infrastructure.Services;
 
 namespace SmartFridgeManagerAPI.IntegrationTests.Infrastructure;
 
@@ -36,7 +37,16 @@ public abstract class IntegrationTestsFactory : IClassFixture<WebApplicationFact
                     services.Remove(mediator);
                 }
 
+                ServiceDescriptor? rabbitMq = services
+                    .SingleOrDefault(service => service.ServiceType == typeof(IRabbitMqService));
+
+                if (rabbitMq != null)
+                {
+                    services.Remove(rabbitMq);
+                }
+
                 services.AddScoped<IMediator>(_ => _mediatorFake);
+                services.AddScoped<IRabbitMqService>(_ => Substitute.For<IRabbitMqService>());
 
                 services
                     .AddDbContext<AppDbContext>(options => options.UseInMemoryDatabase(Guid.NewGuid().ToString()));

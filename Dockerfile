@@ -28,12 +28,22 @@ RUN ls -la /app/out
 
 FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
+
+RUN apt-get update && apt-get install -y wget && \
+    wget -q https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh && \
+    chmod +x wait-for-it.sh
+
 COPY --from=build-env /app/out .
 
 RUN ls -la /app
 
 ENV ASPNETCORE_URLS=http://+:80
+ENV WAIT_TIMEOUT=60
 
 EXPOSE 80
 
-ENTRYPOINT ["dotnet", "SmartFridgeManagerAPI.WebAPI.dll"]
+ENTRYPOINT ["sh", "-c", "\
+    ./wait-for-it.sh ${RABBITMQ_HOSTNAME}:${RABBITMQ_PORT} --timeout=${WAIT_TIMEOUT} --strict && \
+    ./wait-for-it.sh ${DB_HOSTNAME}:${DB_PORT} --timeout=${WAIT_TIMEOUT} --strict && \
+    # ./wait-for-it.sh redis:${REDIS_PORT} --timeout=${WAIT_TIMEOUT} --strict && \
+    dotnet SmartFridgeManagerAPI.WebAPI.dll"]

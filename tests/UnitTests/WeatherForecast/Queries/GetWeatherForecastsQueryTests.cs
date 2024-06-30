@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SmartFridgeManagerAPI.Application.WeatherForecast.Queries;
 using SmartFridgeManagerAPI.Domain.Entities;
+using SmartFridgeManagerAPI.Domain.Queues;
 using SmartFridgeManagerAPI.UnitTests.Infrastructure;
 
 namespace SmartFridgeManagerAPI.UnitTests.WeatherForecast.Queries;
@@ -15,6 +16,7 @@ public class GetWeatherForecastsQueryTests : UnitTestFactory<GetWeatherForecasts
         IEnumerable<Application.WeatherForecast.Queries.WeatherForecast> result = await _mediator.Send(request);
 
         result.Count().Should().Be(5);
+        _rabbitMq.Received(1).BasicPublish(Arg.Any<EmailQueue>());
     }
 
     [Fact]
@@ -54,5 +56,6 @@ public class GetWeatherForecastsQueryTests : UnitTestFactory<GetWeatherForecasts
         List<User> result = await _dbContext.Users.ToListAsync();
 
         result.Count().Should().Be(users.Count());
+        _rabbitMq.Received(0).BasicPublish(Arg.Any<EmailQueue>());
     }
 }
