@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Localization;
 using SmartFridgeManagerAPI.Infrastructure.Data;
 
 namespace SmartFridgeManagerAPI.Application.Auth.Commands.RegisterUser;
@@ -6,40 +7,50 @@ public class RegisterUserCommandValidator : AbstractValidator<RegisterUserComman
 {
     private readonly AppDbContext _context;
 
-    public RegisterUserCommandValidator(AppDbContext context)
+    public RegisterUserCommandValidator(AppDbContext context, IStringLocalizer<Properties> properties,
+        IStringLocalizer<Messages> messages)
     {
         _context = context;
 
         RuleFor(x => x.Username)
             .Cascade(CascadeMode.Stop)
-            .NotEmpty()
-            .MaximumLength(126)
+            .NotEmpty().WithName(properties["Username"])
+            .MaximumLength(126).WithName(properties["Username"])
             .Matches("^[a-zA-Z0-9_-]+$")
-            .WithMessage(
-                "Username contains invalid characters. Only letters, numbers, underscores, and hyphens are allowed.")
-            .MustAsync(MustUniqueUsername).WithMessage("Username must be unique");
+            .WithName(properties["Username"])
+            .WithMessage(messages["ContainInvalidCharacters"])
+            .MustAsync(MustUniqueUsername).WithName(properties["Username"])
+            .WithMessage(messages["MustBeUnique"]);
 
         RuleFor(x => x.Email)
             .Cascade(CascadeMode.Stop)
-            .EmailAddress()
-            .MustAsync(MustUniqueEmail).WithMessage("Email must be unique");
+            .EmailAddress().WithName(properties["Email"])
+            .MustAsync(MustUniqueEmail).WithMessage(messages["MustBeUnique"]);
 
         RuleFor(x => x.ConfirmEmail)
-            .NotEmpty()
-            .Matches(x => x.Email);
+            .NotEmpty().WithName(properties["ConfirmEmail"])
+            .Equal(x => x.Email).WithMessage(string.Format(messages["MustHasSameValue"], properties["ConfirmEmail"],
+                properties["Email"]));
 
         RuleFor(x => x.Password)
-            .NotEmpty().WithMessage("Password is required.")
-            .MinimumLength(8).WithMessage("Password must be at least 8 characters long.")
-            .MaximumLength(64).WithMessage("Password must be at most 64 characters long.")
-            .Matches("[A-Z]").WithMessage("Password must contain at least one uppercase letter.")
-            .Matches("[a-z]").WithMessage("Password must contain at least one lowercase letter.")
-            .Matches("[0-9]").WithMessage("Password must contain at least one digit.")
-            .Matches("[^a-zA-Z0-9]").WithMessage("Password must contain at least one special character.");
+            .NotEmpty().WithName(properties["Password"])
+            .MinimumLength(8).WithName(properties["Password"])
+            .MaximumLength(64).WithName(properties["Password"])
+            .Matches("[A-Z]").WithName(properties["Password"]).WithMessage(messages["MustHasOneUppercase"])
+            .Matches("[a-z]").WithName(properties["Password"]).WithMessage(messages["MustHasOneLowercase"])
+            .Matches("[0-9]").WithName(properties["Password"]).WithMessage(messages["MustHasOneDigit"])
+            .Matches("[^a-zA-Z0-9]").WithName(properties["Password"])
+            .WithMessage(messages["MustHasOneSpecialCharacter"]);
 
         RuleFor(x => x.ConfirmPassword)
-            .NotEmpty()
-            .Matches(x => x.Password);
+            .NotEmpty().WithName(properties["ConfirmPassword"])
+            .Matches(x => x.Password).WithMessage(string.Format(messages["MustHasSameValue"],
+                properties["ConfirmPassword"],
+                properties["Password"]));
+
+        RuleFor(x => x.ActivationTokenRedirectUrl)
+            .MaximumLength(256)
+            .NotEmpty();
     }
 
     private async Task<bool> MustUniqueUsername(string username, CancellationToken cancellationToken)

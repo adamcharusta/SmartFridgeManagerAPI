@@ -1,4 +1,5 @@
 using SmartFridgeManagerAPI.Application.Auth.Commands.RegisterUser;
+using SmartFridgeManagerAPI.Application.Auth.Dtos;
 using SmartFridgeManagerAPI.WebAPI.Infrastructure;
 
 namespace SmartFridgeManagerAPI.WebAPI.Endpoints;
@@ -11,9 +12,8 @@ public class Auth : EndpointGroupBase
             .MapPost(RegisterUser, "register");
     }
 
-    private async Task<IResult> RegisterUser(ISender sender, RegisterUserCommand command)
+    private async Task<AuthResponse> RegisterUser(ISender sender, RegisterUserCommand command)
     {
-        await sender.Send(command);
-        return Results.Created();
+        return await sender.Send(command);
     }
 }

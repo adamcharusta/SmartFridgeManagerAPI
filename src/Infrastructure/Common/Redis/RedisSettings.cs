@@ -1,4 +1,4 @@
-namespace SmartFridgeManagerAPI.Infrastructure.Common.Settings;
+namespace SmartFridgeManagerAPI.Infrastructure.Common.Redis;
 
 public class RedisSettings
 {

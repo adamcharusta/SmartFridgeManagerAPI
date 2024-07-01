@@ -1,9 +1,8 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization.Policy;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
-using NSubstitute;
-using SmartFridgeManagerAPI.Infrastructure.Common.Services;
+using SmartFridgeManagerAPI.Infrastructure.Common.RabbitMq;
+using SmartFridgeManagerAPI.Infrastructure.Common.Redis;
 using SmartFridgeManagerAPI.Infrastructure.Data;
 
 namespace SmartFridgeManagerAPI.IntegrationTests.Infrastructure;

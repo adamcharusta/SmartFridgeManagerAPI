@@ -1,5 +1,6 @@
 using SmartFridgeManagerAPI.Domain.Queues;
-using SmartFridgeManagerAPI.Infrastructure.Common.Services;
+using SmartFridgeManagerAPI.Infrastructure.Common.RabbitMq;
+using SmartFridgeManagerAPI.Infrastructure.Common.Redis;
 
 namespace SmartFridgeManagerAPI.Application.WeatherForecasts.Queries;
 

@@ -47,7 +47,7 @@ public class GetWeatherForecastsQueryTests : UnitTestFactory<object, GetWeatherF
                 Username = "Test",
                 Email = "Test",
                 Password = "Test",
-                ActivationToken = new ActivationToken { Token = "" },
+                ActivationTokens = new List<ActivationToken> { new() },
                 ResetPasswordTokens = new List<ResetPasswordToken>()
             },
             new User
@@ -55,7 +55,7 @@ public class GetWeatherForecastsQueryTests : UnitTestFactory<object, GetWeatherF
                 Username = "Test2",
                 Email = "Test2",
                 Password = "Test2",
-                ActivationToken = new ActivationToken { Token = "" },
+                ActivationTokens = new List<ActivationToken> { new() },
                 ResetPasswordTokens = new List<ResetPasswordToken>()
             },
             new User
@@ -63,7 +63,7 @@ public class GetWeatherForecastsQueryTests : UnitTestFactory<object, GetWeatherF
                 Username = "Test3",
                 Email = "Test3",
                 Password = "Test3",
-                ActivationToken = new ActivationToken { Token = "" },
+                ActivationTokens = new List<ActivationToken> { new() },
                 ResetPasswordTokens = new List<ResetPasswordToken>()
             }
         ];

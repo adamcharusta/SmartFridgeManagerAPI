@@ -1,4 +1,5 @@
 using RabbitMQ.Client;
+using Serilog;
 
 namespace SmartFridgeManagerAPI.Domain.Queues.Common;
 
@@ -13,4 +14,9 @@ public abstract class BaseQueue<T> where T : class
     public abstract string Queue { get; }
     public abstract bool Durable { get; }
     public abstract T Body { get; }
+
+    public void LogEvent()
+    {
+        Log.Logger.Information($"SmartFridgeManagerAPI publish message {typeof(T).Name}");
+    }
 }

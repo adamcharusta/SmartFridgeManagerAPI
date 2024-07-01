@@ -1,4 +1,4 @@
-namespace SmartFridgeManagerAPI.Infrastructure.Common.Services;
+namespace SmartFridgeManagerAPI.Infrastructure.Common.Redis;
 
 public interface IRedisService
 {

@@ -1,7 +1,6 @@
-using SmartFridgeManagerAPI.Infrastructure.Common.Settings;
 using StackExchange.Redis;
 
-namespace SmartFridgeManagerAPI.Infrastructure.Common.Services;
+namespace SmartFridgeManagerAPI.Infrastructure.Common.Redis;
 
 public class RedisService : IRedisService
 {
@@ -19,7 +18,7 @@ public class RedisService : IRedisService
         try
         {
             RedisValue data = await _database.StringGetAsync(key);
-            Log.Logger.Information("Get data from redis database.");
+            Log.Logger.Information($"SmartFridgeManagerAPI read to cache key[{key}]");
             return JsonConvert.DeserializeObject<T>(data.ToString());
         }
         catch (Exception e)
@@ -33,7 +32,7 @@ public class RedisService : IRedisService
     {
         try
         {
-            Log.Logger.Information("Remove data from redis database.");
+            Log.Logger.Information($"SmartFridgeManagerAPI delete from cache key[{key}]");
             return await _database.KeyDeleteAsync(key);
         }
         catch (Exception e)
@@ -51,7 +50,7 @@ public class RedisService : IRedisService
 
             Guard.Against.NegativeOrZero(expiry.TotalSeconds, "expiredDate must be greater than DateTime.Now");
             string data = JsonConvert.SerializeObject(value);
-            Log.Logger.Information("Save data to redis database.");
+            Log.Logger.Information($"SmartFridgeManagerAPI delete from cache key[{key}], type[{typeof(T).Name}]");
             return await _database.StringSetAsync(key, data, expiry);
         }
         catch (Exception e)

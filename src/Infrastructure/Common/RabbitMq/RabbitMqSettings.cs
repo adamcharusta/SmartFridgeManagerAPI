@@ -1,4 +1,4 @@
-namespace SmartFridgeManagerAPI.Infrastructure.Common.Settings;
+namespace SmartFridgeManagerAPI.Infrastructure.Common.RabbitMq;
 
 public class RabbitMqSettings
 {

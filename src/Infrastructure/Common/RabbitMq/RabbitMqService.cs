@@ -1,9 +1,8 @@
 using System.Text;
 using RabbitMQ.Client;
 using SmartFridgeManagerAPI.Domain.Queues.Common;
-using SmartFridgeManagerAPI.Infrastructure.Common.Settings;
 
-namespace SmartFridgeManagerAPI.Infrastructure.Common.Services;
+namespace SmartFridgeManagerAPI.Infrastructure.Common.RabbitMq;
 
 public class RabbitMqService : IRabbitMqService
 {
@@ -26,24 +25,32 @@ public class RabbitMqService : IRabbitMqService
 
     public void BasicPublish<T>(BaseQueue<T> queue) where T : class
     {
-        _channel.QueueDeclare(
-            queue.Queue,
-            queue.Durable,
-            queue.Exclusive,
-            queue.AutoDelete,
-            queue.Arguments
-        );
+        try
+        {
+            _channel.QueueDeclare(
+                queue.Queue,
+                queue.Durable,
+                queue.Exclusive,
+                queue.AutoDelete,
+                queue.Arguments
+            );
 
-        string message = JsonConvert.SerializeObject(queue.Body);
-        byte[] body = Encoding.UTF8.GetBytes(message);
+            string message = JsonConvert.SerializeObject(queue.Body);
+            byte[] body = Encoding.UTF8.GetBytes(message);
 
-        _channel.BasicPublish(
-            queue.Exchange,
-            queue.RoutingKey,
-            queue.BasicProperties,
-            body);
+            _channel.BasicPublish(
+                queue.Exchange,
+                queue.RoutingKey,
+                queue.BasicProperties,
+                body);
 
-        Log.Logger.Information($"Successful publication to: {queue.Queue}");
+            queue.LogEvent();
+        }
+        catch (Exception e)
+        {
+            Log.Logger.Error(e, "An error while publish message");
+            throw;
+        }
     }
 
     ~RabbitMqService()

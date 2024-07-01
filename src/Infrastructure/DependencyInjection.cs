@@ -2,8 +2,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using SmartFridgeManagerAPI.Infrastructure.Common.Services;
-using SmartFridgeManagerAPI.Infrastructure.Common.Settings;
+using SmartFridgeManagerAPI.Infrastructure.Common.RabbitMq;
+using SmartFridgeManagerAPI.Infrastructure.Common.Redis;
 using SmartFridgeManagerAPI.Infrastructure.Data;
 using SmartFridgeManagerAPI.Infrastructure.Data.Interceptors;
 

@@ -1,6 +1,6 @@
 using SmartFridgeManagerAPI.Domain.Queues.Common;
 
-namespace SmartFridgeManagerAPI.Infrastructure.Common.Services;
+namespace SmartFridgeManagerAPI.Infrastructure.Common.RabbitMq;
 
 public interface IRabbitMqService
 {

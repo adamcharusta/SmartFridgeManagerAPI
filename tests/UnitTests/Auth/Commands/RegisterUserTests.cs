@@ -1,4 +1,5 @@
 using SmartFridgeManagerAPI.Application.Auth.Commands.RegisterUser;
+using SmartFridgeManagerAPI.Application.Auth.Dtos;
 using SmartFridgeManagerAPI.Domain.Entities;
 using SmartFridgeManagerAPI.UnitTests.Infrastructure;
 
@@ -15,43 +16,53 @@ public class RegisterUserTests : UnitTestFactory<RegisterUserCommand, RegisterUs
             Password = "zaq1@WSX",
             ConfirmPassword = "zaq1@WSX",
             ConfirmEmail = "test@test.com",
-            Email = "test@test.com"
+            Email = "test@test.com",
+            ActivationTokenRedirectUrl = "url"
         };
 
         await _mediator.Send(newUser);
 
-        List<User> result = await _dbContext.Users.Include(x => x.ActivationToken).ToListAsync();
+        List<User> result = await _dbContext.Users.Include(x => x.ActivationTokens).ToListAsync();
         User userFromDb = result[0];
         PasswordVerificationResult passwordResult =
             _passwordHasher.VerifyHashedPassword(userFromDb, userFromDb.Password, newUser.Password);
 
         userFromDb.Username.Should().Be(newUser.Username);
         userFromDb.Email.Should().Be(newUser.Email);
-        userFromDb.ActivationToken.Should().NotBeNull();
+        userFromDb.ActivationTokens!.Count.Should().Be(1);
         result.Count.Should().Be(1);
-        _authEmailService.Received(1).SendActivationEmail(userFromDb.Email, userFromDb.ActivationToken!.Token);
+        _authEmailService.Received(1).SendActivationEmail(userFromDb.Email, newUser.ActivationTokenRedirectUrl,
+            userFromDb.ActivationTokens.First().Token);
         passwordResult.Should().Be(PasswordVerificationResult.Success);
     }
 
     [Theory]
-    [InlineData("badUsername,.", "sameEmail@test.com", "sameEmail@test.com", "goodPassword123!", "goodPassword123!")]
-    [InlineData("goodUsername", "sameEmail@test.com", "notSameEmail@test.com", "goodPassword123!", "goodPassword123!")]
-    [InlineData("goodUsername", "badEmailFormat", "email@test.com", "goodPassword123!", "goodPassword123!")]
-    [InlineData("goodUsername", "sameEmail@test.com", "sameEmail@test.com", "goodPassword123!", "notSamePassword123!")]
-    [InlineData("goodUsername", "sameEmail@test.com", "sameEmail@test.com", "withoutbigletter1!", "goodPassword123!")]
-    [InlineData("goodUsername", "sameEmail@test.com", "sameEmail@test.com", "withoutNumber!", "goodPassword123!")]
-    [InlineData("goodUsername", "sameEmail@test.com", "sameEmail@test.com", "withoutSymbol1", "goodPassword123!")]
-    [InlineData("goodUsername", "sameEmail@test.com", "sameEmail@test.com", "t0Shor!", "t0Shor!")]
+    [InlineData("badUsername,.", "sameEmail@test.com", "sameEmail@test.com", "goodPassword123!", "goodPassword123!",
+        "")]
+    [InlineData("badUsername,.", "sameEmail@test.com", "sameEmail@test.com", "goodPassword123!", "goodPassword123!",
+        "url")]
+    [InlineData("goodUsername", "sameEmail@test.com", "notSameEmail@test.com", "goodPassword123!", "goodPassword123!",
+        "url")]
+    [InlineData("goodUsername", "badEmailFormat", "email@test.com", "goodPassword123!", "goodPassword123!", "url")]
+    [InlineData("goodUsername", "sameEmail@test.com", "sameEmail@test.com", "goodPassword123!", "notSamePassword123!",
+        "url")]
+    [InlineData("goodUsername", "sameEmail@test.com", "sameEmail@test.com", "withoutbigletter1!", "goodPassword123!",
+        "url")]
+    [InlineData("goodUsername", "sameEmail@test.com", "sameEmail@test.com", "withoutNumber!", "goodPassword123!",
+        "url")]
+    [InlineData("goodUsername", "sameEmail@test.com", "sameEmail@test.com", "withoutSymbol1", "goodPassword123!",
+        "url")]
+    [InlineData("goodUsername", "sameEmail@test.com", "sameEmail@test.com", "t0Shor!", "t0Shor!", "url")]
     [InlineData("goodUsername", "sameEmail@test.com", "sameEmail@test.com",
         "toL0ng!123123zsdddddddfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdf",
-        "toL0ng!123123zsdddddddfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdf")]
-    [InlineData("", "sameEmail@test.com", "sameEmail@test.com", "goodPassword123!", "goodPassword123!")]
-    [InlineData("goodUsername", "", "sameEmail@test.com", "goodPassword123!", "goodPassword123!")]
-    [InlineData("goodUsername", "sameEmail@test.com", "", "goodPassword123!", "goodPassword123!")]
-    [InlineData("goodUsername", "sameEmail@test.com", "sameEmail@test.com", "", "goodPassword123!")]
-    [InlineData("goodUsername", "sameEmail@test.com", "sameEmail@test.com", "goodPassword123!", "")]
+        "toL0ng!123123zsdddddddfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdf", "url")]
+    [InlineData("", "sameEmail@test.com", "sameEmail@test.com", "goodPassword123!", "goodPassword123!", "url")]
+    [InlineData("goodUsername", "", "sameEmail@test.com", "goodPassword123!", "goodPassword123!", "url")]
+    [InlineData("goodUsername", "sameEmail@test.com", "", "goodPassword123!", "goodPassword123!", "url")]
+    [InlineData("goodUsername", "sameEmail@test.com", "sameEmail@test.com", "", "goodPassword123!", "url")]
+    [InlineData("goodUsername", "sameEmail@test.com", "sameEmail@test.com", "goodPassword123!", "", "url")]
     public async Task RegisterUser_OnIncorrectData_ShouldThrowValidationException(string username, string email,
-        string confirmEmail, string password, string confirmPassword)
+        string confirmEmail, string password, string confirmPassword, string url)
     {
         RegisterUserCommand newUser = new()
         {
@@ -59,10 +70,11 @@ public class RegisterUserTests : UnitTestFactory<RegisterUserCommand, RegisterUs
             Password = email,
             ConfirmPassword = confirmEmail,
             ConfirmEmail = password,
-            Email = confirmPassword
+            Email = confirmPassword,
+            ActivationTokenRedirectUrl = url
         };
 
-        Func<Task<int>> act = async () => await _mediator.Send(newUser);
+        Func<Task<AuthResponse>> act = async () => await _mediator.Send(newUser);
 
         await act.Should().ThrowAsync<ValidationException>();
     }
@@ -78,7 +90,8 @@ public class RegisterUserTests : UnitTestFactory<RegisterUserCommand, RegisterUs
             Email = "test@test.com",
             ConfirmEmail = "test@test.com",
             Password = "zaq1@WSX",
-            ConfirmPassword = "zaq1@WSX"
+            ConfirmPassword = "zaq1@WSX",
+            ActivationTokenRedirectUrl = "url"
         };
 
         await _mediator.Send(sameUser);
@@ -89,10 +102,11 @@ public class RegisterUserTests : UnitTestFactory<RegisterUserCommand, RegisterUs
             Email = email,
             ConfirmEmail = email,
             Password = "zaq1@WSX",
-            ConfirmPassword = "zaq1@WSX"
+            ConfirmPassword = "zaq1@WSX",
+            ActivationTokenRedirectUrl = "url"
         };
 
-        Func<Task<int>> act = async () => await _mediator.Send(newUser);
+        Func<Task<AuthResponse>> act = async () => await _mediator.Send(newUser);
 
         await act.Should().ThrowAsync<ValidationException>();
     }

@@ -1,8 +1,7 @@
 using System.Reflection;
 using System.Text;
-using Ardalis.GuardClauses;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -20,7 +19,8 @@ public static class DependencyInjection
     {
         services
             .AddServices()
-            .AddAuthServices(configuration);
+            .AddAuthServices(configuration)
+            .AddLocalization();
 
         return services;
     }
@@ -76,8 +76,27 @@ public static class DependencyInjection
         return services;
     }
 
+    private static IServiceCollection AddLocalization(this IServiceCollection services)
+    {
+        services.AddLocalization(opt => opt.ResourcesPath = "Resources");
+        services.Configure<RequestLocalizationOptions>(opt =>
+        {
+            string[] supportedCultures = ["en-US", "pl-PL"];
+            opt.SetDefaultCulture(supportedCultures[0])
+                .AddSupportedCultures(supportedCultures)
+                .AddSupportedUICultures(supportedCultures)
+                .RequestCultureProviders = new List<IRequestCultureProvider>
+            {
+                new AcceptLanguageHeaderRequestCultureProvider()
+            };
+        });
+
+        return services;
+    }
+
     public static WebApplication UseApplication(this WebApplication app)
     {
+        app.UseRequestLocalization();
         app.UseAuthentication();
         app.UseAuthorization();
 
